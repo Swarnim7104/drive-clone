@@ -1,6 +1,7 @@
 "use client";
+import React from "react";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Badge } from "~/components/ui/badge";
@@ -35,202 +36,12 @@ import {
   Edit,
 } from "lucide-react";
 
-interface FileItem {
-  id: string;
-  name: string;
-  type: "folder" | "file";
-  size?: string;
-  modified: string;
-  fileType?: string;
-  url?: string;
-  corrupted?: boolean;
-  corruptionLevel?: number; // 1-3, higher = more corrupted
-}
+import { mockFiles, mockFolders } from "~/lib/mockData";
+import type { FileItem, Folder as FolderType } from "~/lib/mockData";
 
-const mockData: Record<string, FileItem[]> = {
-  "/": [
-    { id: "1", name: "wired", type: "folder", modified: "1998.07.06" },
-    { id: "2", name: "cyberia", type: "folder", modified: "1998.07.05" },
-    {
-      id: "3",
-      name: "knights_of_eastern_calculus",
-      type: "folder",
-      modified: "1998.07.04",
-    },
-    {
-      id: "4",
-      name: "protocol_7",
-      type: "folder",
-      modified: "1998.07.03",
-      corrupted: true,
-      corruptionLevel: 1,
-    },
-    {
-      id: "5",
-      name: "present_day_present_time.txt",
-      type: "file",
-      size: "1.33 KB",
-      modified: "1998.07.02",
-      fileType: "text",
-      url: "#",
-    },
-    {
-      id: "6",
-      name: "bear_suit.jpg",
-      type: "file",
-      size: "2.4 MB",
-      modified: "1998.07.01",
-      fileType: "image",
-      url: "#",
-    },
-    {
-      id: "7",
-      name: "navi.exe",
-      type: "file",
-      size: "666 KB",
-      modified: "1998.06.30",
-      fileType: "code",
-      url: "#",
-      corrupted: true,
-      corruptionLevel: 2,
-    },
-  ],
-  "/wired": [
-    { id: "8", name: "layer_01", type: "folder", modified: "1998.06.29" },
-    { id: "9", name: "layer_02", type: "folder", modified: "1998.06.28" },
-    {
-      id: "10",
-      name: "layer_13",
-      type: "folder",
-      modified: "1998.06.27",
-      corrupted: true,
-      corruptionLevel: 3,
-    },
-    {
-      id: "11",
-      name: "god_in_the_wired.md",
-      type: "file",
-      size: "4.7 KB",
-      modified: "1998.06.26",
-      fileType: "text",
-      url: "#",
-      corrupted: true,
-      corruptionLevel: 2,
-    },
-    {
-      id: "12",
-      name: "close_the_world.wav",
-      type: "file",
-      size: "13.3 MB",
-      modified: "1998.06.25",
-      fileType: "audio",
-      url: "#",
-    },
-  ],
-  "/cyberia": [
-    { id: "13", name: "rave_kids", type: "folder", modified: "1998.06.24" },
-    {
-      id: "14",
-      name: "accela.zip",
-      type: "file",
-      size: "7.77 MB",
-      modified: "1998.06.23",
-      fileType: "archive",
-      url: "#",
-      corrupted: true,
-      corruptionLevel: 1,
-    },
-    {
-      id: "15",
-      name: "psyche_processor.dll",
-      type: "file",
-      size: "512 KB",
-      modified: "1998.06.22",
-      fileType: "code",
-      url: "#",
-      corrupted: true,
-      corruptionLevel: 3,
-    },
-    {
-      id: "16",
-      name: "reality_distortion.glsl",
-      type: "file",
-      size: "2.1 KB",
-      modified: "1998.06.21",
-      fileType: "code",
-      url: "#",
-    },
-  ],
-  "/knights_of_eastern_calculus": [
-    {
-      id: "17",
-      name: "masami_eiri",
-      type: "folder",
-      modified: "1998.06.20",
-      corrupted: true,
-      corruptionLevel: 2,
-    },
-    {
-      id: "18",
-      name: "tachibana_labs",
-      type: "folder",
-      modified: "1998.06.19",
-    },
-    {
-      id: "19",
-      name: "schumann_resonance.dat",
-      type: "file",
-      size: "8.88 MB",
-      modified: "1998.06.18",
-      fileType: "text",
-      url: "#",
-    },
-    {
-      id: "20",
-      name: "love_machine.exe",
-      type: "file",
-      size: "1.21 MB",
-      modified: "1998.06.17",
-      fileType: "code",
-      url: "#",
-      corrupted: true,
-      corruptionLevel: 1,
-    },
-  ],
-  "/protocol_7": [
-    {
-      id: "21",
-      name: "ipv7_implementation.c",
-      type: "file",
-      size: "15.5 KB",
-      modified: "1998.06.16",
-      fileType: "code",
-      url: "#",
-      corrupted: true,
-      corruptionLevel: 3,
-    },
-    {
-      id: "22",
-      name: "network_topology.svg",
-      type: "file",
-      size: "3.3 KB",
-      modified: "1998.06.15",
-      fileType: "image",
-      url: "#",
-    },
-    {
-      id: "23",
-      name: "omnipresence_protocol.pdf",
-      type: "file",
-      size: "2.22 MB",
-      modified: "1998.06.14",
-      fileType: "text",
-      url: "#",
-      corrupted: true,
-      corruptionLevel: 2,
-    },
-  ],
-};
+import { corruptText, getCorruptionClasses } from "~/lib/corruptionEffects";
+
+type AnyFileSystemItem = FileItem | FolderType;
 
 const getFileIcon = (fileType?: string) => {
   switch (fileType) {
@@ -252,118 +63,8 @@ const getFileIcon = (fileType?: string) => {
   }
 };
 
-// Corruption effect functions
-const corruptText = (
-  text: string,
-  level: number,
-  isActive: boolean,
-): string => {
-  if (!isActive) return text;
-
-  const corruptChars = [
-    "█",
-    "▓",
-    "▒",
-    "░",
-    "◆",
-    "◇",
-    "◈",
-    "◉",
-    "●",
-    "○",
-    "▪",
-    "▫",
-    "■",
-    "□",
-    "▲",
-    "△",
-    "▼",
-    "▽",
-    "◀",
-    "▷",
-    "◁",
-    "▶",
-  ];
-  const glitchChars = [
-    "!",
-    "@",
-    "#",
-    "$",
-    "%",
-    "^",
-    "&",
-    "*",
-    "?",
-    "<",
-    ">",
-    "|",
-    "~",
-    "`",
-  ];
-
-  let corrupted = text;
-  const corruptionRate = level * 0.15; // 15%, 30%, 45% corruption based on level
-
-  for (let i = 0; i < corrupted.length; i++) {
-    if (Math.random() < corruptionRate) {
-      if (level >= 3) {
-        corrupted =
-          corrupted.substring(0, i) +
-          corruptChars[Math.floor(Math.random() * corruptChars.length)] +
-          corrupted.substring(i + 1);
-      } else if (level >= 2) {
-        corrupted =
-          corrupted.substring(0, i) +
-          glitchChars[Math.floor(Math.random() * glitchChars.length)] +
-          corrupted.substring(i + 1);
-      } else {
-        // Level 1: just replace with similar looking characters
-        const currentChar = corrupted[i];
-        if (typeof currentChar === "string") {
-          const char = currentChar.toLowerCase();
-
-          const replacements: Record<string, string> = {
-            a: "@",
-            e: "3",
-            i: "1",
-            o: "0",
-            s: "$",
-            t: "7",
-            l: "1",
-          };
-          if (replacements[char]) {
-            corrupted =
-              corrupted.substring(0, i) +
-              replacements[char] +
-              corrupted.substring(i + 1);
-          }
-        }
-      }
-    }
-  }
-
-  return corrupted;
-};
-
-const getCorruptionClasses = (level: number, isActive: boolean): string => {
-  if (!isActive) return "";
-
-  const baseClasses = "transition-all duration-100";
-
-  switch (level) {
-    case 1:
-      return `${baseClasses} text-red-400/80`;
-    case 2:
-      return `${baseClasses} text-red-400 animate-pulse`;
-    case 3:
-      return `${baseClasses} text-red-500 animate-pulse bg-red-500/10 px-1 -mx-1 rounded`;
-    default:
-      return baseClasses;
-  }
-};
-
 export default function Component() {
-  const [currentPath, setCurrentPath] = useState("/");
+  const [currentFolderId, setCurrentFolderId] = useState<string | null>("root");
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
   const [easterEggTriggered, setEasterEggTriggered] = useState(false);
@@ -373,8 +74,17 @@ export default function Component() {
     Record<string, boolean>
   >({});
 
-  const currentItems = mockData[currentPath] ?? [];
-  const pathSegments = currentPath.split("/").filter(Boolean);
+  const currentItems: AnyFileSystemItem[] = useMemo(() => {
+    const foldersInCurrent = mockFolders.filter(
+      (folder) => folder.parentId === currentFolderId,
+    );
+    const filesInCurent = mockFiles.filter(
+      (file) => file.parentId === currentFolderId,
+    );
+    return [...foldersInCurrent, ...filesInCurent].sort((a, b) =>
+      a.name.localeCompare(b.name),
+    );
+  }, [currentFolderId]);
 
   // Random glitch effect
   useEffect(() => {
@@ -447,33 +157,57 @@ export default function Component() {
     console.log("⚠️ Some files appear to be corrupted...");
   }, []);
 
-  const navigateToFolder = (folderName: string) => {
-    const newPath =
-      currentPath === "/" ? `/${folderName}` : `${currentPath}/${folderName}`;
-    setCurrentPath(newPath);
+  const navigateToFolder = (folderId: string) => {
+    setCurrentFolderId(folderId);
     setSelectedItems([]);
+
+    const folder = mockFolders.find((f) => f.id === folderId);
 
     // Easter egg: Special folder messages
-    if (folderName === "wired") {
-      console.log("🌐 Entering the Wired... Reality and virtuality merge.");
-    } else if (folderName === "cyberia") {
-      console.log("🎵 Welcome to Cyberia. The music never stops.");
-    } else if (folderName === "protocol_7") {
-      console.log(
-        "⚠️ WARNING: Protocol 7 files detected. Data integrity compromised.",
-      );
+    if (folder) {
+      if (folder.name === "wired") {
+        console.log("🌐 Entering the Wired... Reality and virtuality merge.");
+      } else if (folder.name === "cyberia") {
+        console.log("🎵 Welcome to Cyberia. The music never stops.");
+      } else if (folder.name === "protocol_7") {
+        console.log(
+          "⚠️ WARNING: Protocol 7 files detected. Data integrity compromised.",
+        );
+      }
     }
   };
 
-  const navigateToPath = (index: number) => {
-    if (index === -1) {
-      setCurrentPath("/");
-    } else {
-      const newPath = "/" + pathSegments.slice(0, index + 1).join("/");
-      setCurrentPath(newPath);
+  const handleGoUp = () => {
+    const currentFolder = mockFolders.find((f) => f.id === currentFolderId);
+    if (currentFolder && currentFolder.parentId !== null) {
+      setCurrentFolderId(currentFolder.parentId);
+      setSelectedItems([]);
     }
-    setSelectedItems([]);
   };
+
+  // Generate breadcrumbs dynamically based on currentFolderId
+  const getBreadcrumbs = useMemo(() => {
+    const breadcrumbs: FolderType[] = [];
+    let current: FolderType | undefined = mockFolders.find(
+      (f) => f.id === currentFolderId,
+    );
+
+    while (current) {
+      const folderToProcess: FolderType = current;
+
+      breadcrumbs.unshift(folderToProcess); // Add to the beginning to keep order
+      if (folderToProcess.parentId === null) break; // Stop at the root
+      const nextParentCandidate = mockFolders.find(
+        (f) => f.id === folderToProcess.parentId,
+      );
+      if (!nextParentCandidate || nextParentCandidate.type !== "folder") {
+        current = undefined; // Set current to undefined to terminate loop
+      } else {
+        break;
+      }
+    }
+    return breadcrumbs;
+  }, [currentFolderId]);
 
   const toggleItemSelection = (itemId: string) => {
     setSelectedItems((prev) =>
@@ -572,7 +306,7 @@ export default function Component() {
                   <div className="space-y-4">
                     <Input
                       type="file"
-                      className="border-green-400/30 bg-black/50 text-green-400 file:mr-4 file:rounded file:border file:border-0 file:border-green-400/30 file:bg-green-400/10 file:px-4 file:py-2 file:text-green-400 file:transition-colors file:hover:bg-green-400/20"
+                      className="border-green-400/30 bg-black/50 text-green-400 file:mr-4 file:rounded file:border file:border-green-400/30 file:bg-green-400/10 file:px-4 file:py-2 file:text-green-400 file:transition-colors file:hover:bg-green-400/20"
                       multiple
                     />
                     <Button
@@ -589,23 +323,23 @@ export default function Component() {
             {/* Breadcrumbs */}
             <nav className="mt-3 flex items-center space-x-2 text-sm text-green-400/70">
               <button
-                onClick={() => navigateToPath(-1)}
+                onClick={handleGoUp}
                 className="flex items-center space-x-1 transition-colors hover:text-green-400"
               >
                 <Home className="h-3 w-3" />
                 <span>~</span>
               </button>
 
-              {pathSegments.map((segment, index) => (
-                <div key={index} className="flex items-center space-x-2">
+              {getBreadcrumbs.map((segment, _index) => (
+                <React.Fragment key={segment.id}>
                   <ChevronRight className="h-3 w-3 text-green-400/40" />
                   <button
-                    onClick={() => navigateToPath(index)}
+                    onClick={() => navigateToFolder(segment.id)} // Navigate using the folder's ID
                     className="transition-colors hover:text-green-400"
                   >
-                    {segment}
+                    {segment.name}
                   </button>
-                </div>
+                </React.Fragment>
               ))}
             </nav>
           </div>
@@ -626,7 +360,8 @@ export default function Component() {
             <div className="divide-y divide-green-400/10">
               {currentItems.map((item) => {
                 const isCorrupted =
-                  (item.corrupted ?? false) && (corruptionActive[item.id] ?? false);
+                  (item.corrupted ?? false) &&
+                  (corruptionActive[item.id] ?? false);
                 const corruptedName = item.corrupted
                   ? corruptText(
                       item.name,
@@ -634,14 +369,18 @@ export default function Component() {
                       isCorrupted,
                     )
                   : item.name;
+
+                const isFile = item.type === "file";
                 const corruptedSize =
-                  item.corrupted && item.size
+                  isFile && item.corrupted && item.size
                     ? corruptText(
                         item.size,
                         item.corruptionLevel ?? 1,
                         isCorrupted,
                       )
-                    : item.size;
+                    : isFile
+                      ? item.size
+                      : "-";
                 const corruptedDate = item.corrupted
                   ? corruptText(
                       item.modified,
@@ -674,7 +413,7 @@ export default function Component() {
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
-                            navigateToFolder(item.name);
+                            navigateToFolder(item.id);
                           }}
                           className={`text-sm text-green-400 transition-colors hover:text-green-300 ${getCorruptionClasses(item.corruptionLevel ?? 0, isCorrupted)}`}
                         >
@@ -795,7 +534,7 @@ export default function Component() {
                 <span>online</span>
               </div>
               <div className="font-mono">
-                {currentPath === "/" ? "~" : currentPath}
+                {getBreadcrumbs.map((crumb) => crumb.name).join("/")}
               </div>
             </div>
           </div>
