@@ -1,11 +1,22 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { Button } from "~/components/ui/button"
-import { Input } from "~/components/ui/input"
-import { Badge } from "~/components/ui/badge"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "~/components/ui/dropdown-menu"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "~/components/ui/dialog"
+import { useState, useEffect } from "react";
+import { Button } from "~/components/ui/button";
+import { Input } from "~/components/ui/input";
+import { Badge } from "~/components/ui/badge";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "~/components/ui/dropdown-menu";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "~/components/ui/dialog";
 import {
   Folder,
   File,
@@ -22,26 +33,38 @@ import {
   Download,
   Trash2,
   Edit,
-} from "lucide-react"
+} from "lucide-react";
 
 interface FileItem {
-  id: string
-  name: string
-  type: "folder" | "file"
-  size?: string
-  modified: string
-  fileType?: string
-  url?: string
-  corrupted?: boolean
-  corruptionLevel?: number // 1-3, higher = more corrupted
+  id: string;
+  name: string;
+  type: "folder" | "file";
+  size?: string;
+  modified: string;
+  fileType?: string;
+  url?: string;
+  corrupted?: boolean;
+  corruptionLevel?: number; // 1-3, higher = more corrupted
 }
 
 const mockData: Record<string, FileItem[]> = {
   "/": [
     { id: "1", name: "wired", type: "folder", modified: "1998.07.06" },
     { id: "2", name: "cyberia", type: "folder", modified: "1998.07.05" },
-    { id: "3", name: "knights_of_eastern_calculus", type: "folder", modified: "1998.07.04" },
-    { id: "4", name: "protocol_7", type: "folder", modified: "1998.07.03", corrupted: true, corruptionLevel: 1 },
+    {
+      id: "3",
+      name: "knights_of_eastern_calculus",
+      type: "folder",
+      modified: "1998.07.04",
+    },
+    {
+      id: "4",
+      name: "protocol_7",
+      type: "folder",
+      modified: "1998.07.03",
+      corrupted: true,
+      corruptionLevel: 1,
+    },
     {
       id: "5",
       name: "present_day_present_time.txt",
@@ -75,7 +98,14 @@ const mockData: Record<string, FileItem[]> = {
   "/wired": [
     { id: "8", name: "layer_01", type: "folder", modified: "1998.06.29" },
     { id: "9", name: "layer_02", type: "folder", modified: "1998.06.28" },
-    { id: "10", name: "layer_13", type: "folder", modified: "1998.06.27", corrupted: true, corruptionLevel: 3 },
+    {
+      id: "10",
+      name: "layer_13",
+      type: "folder",
+      modified: "1998.06.27",
+      corrupted: true,
+      corruptionLevel: 3,
+    },
     {
       id: "11",
       name: "god_in_the_wired.md",
@@ -132,8 +162,20 @@ const mockData: Record<string, FileItem[]> = {
     },
   ],
   "/knights_of_eastern_calculus": [
-    { id: "17", name: "masami_eiri", type: "folder", modified: "1998.06.20", corrupted: true, corruptionLevel: 2 },
-    { id: "18", name: "tachibana_labs", type: "folder", modified: "1998.06.19" },
+    {
+      id: "17",
+      name: "masami_eiri",
+      type: "folder",
+      modified: "1998.06.20",
+      corrupted: true,
+      corruptionLevel: 2,
+    },
+    {
+      id: "18",
+      name: "tachibana_labs",
+      type: "folder",
+      modified: "1998.06.19",
+    },
     {
       id: "19",
       name: "schumann_resonance.dat",
@@ -188,31 +230,35 @@ const mockData: Record<string, FileItem[]> = {
       corruptionLevel: 2,
     },
   ],
-}
+};
 
 const getFileIcon = (fileType?: string) => {
   switch (fileType) {
     case "image":
-      return <ImageIcon className="w-4 h-4" />
+      return <ImageIcon className="h-4 w-4" />;
     case "text":
     case "pdf":
-      return <FileText className="w-4 h-4" />
+      return <FileText className="h-4 w-4" />;
     case "audio":
-      return <Music className="w-4 h-4" />
+      return <Music className="h-4 w-4" />;
     case "video":
-      return <Video className="w-4 h-4" />
+      return <Video className="h-4 w-4" />;
     case "archive":
-      return <Archive className="w-4 h-4" />
+      return <Archive className="h-4 w-4" />;
     case "code":
-      return <Code className="w-4 h-4" />
+      return <Code className="h-4 w-4" />;
     default:
-      return <File className="w-4 h-4" />
+      return <File className="h-4 w-4" />;
   }
-}
+};
 
 // Corruption effect functions
-const corruptText = (text: string, level: number, isActive: boolean): string => {
-  if (!isActive) return text
+const corruptText = (
+  text: string,
+  level: number,
+  isActive: boolean,
+): string => {
+  if (!isActive) return text;
 
   const corruptChars = [
     "█",
@@ -237,11 +283,26 @@ const corruptText = (text: string, level: number, isActive: boolean): string => 
     "▷",
     "◁",
     "▶",
-  ]
-  const glitchChars = ["!", "@", "#", "$", "%", "^", "&", "*", "?", "<", ">", "|", "~", "`"]
+  ];
+  const glitchChars = [
+    "!",
+    "@",
+    "#",
+    "$",
+    "%",
+    "^",
+    "&",
+    "*",
+    "?",
+    "<",
+    ">",
+    "|",
+    "~",
+    "`",
+  ];
 
-  let corrupted = text
-  const corruptionRate = level * 0.15 // 15%, 30%, 45% corruption based on level
+  let corrupted = text;
+  const corruptionRate = level * 0.15; // 15%, 30%, 45% corruption based on level
 
   for (let i = 0; i < corrupted.length; i++) {
     if (Math.random() < corruptionRate) {
@@ -249,95 +310,104 @@ const corruptText = (text: string, level: number, isActive: boolean): string => 
         corrupted =
           corrupted.substring(0, i) +
           corruptChars[Math.floor(Math.random() * corruptChars.length)] +
-          corrupted.substring(i + 1)
+          corrupted.substring(i + 1);
       } else if (level >= 2) {
         corrupted =
           corrupted.substring(0, i) +
           glitchChars[Math.floor(Math.random() * glitchChars.length)] +
-          corrupted.substring(i + 1)
+          corrupted.substring(i + 1);
       } else {
         // Level 1: just replace with similar looking characters
-        const char = corrupted[i].toLowerCase()
-        const replacements: Record<string, string> = {
-          a: "@",
-          e: "3",
-          i: "1",
-          o: "0",
-          s: "$",
-          t: "7",
-          l: "1",
-        }
-        if (replacements[char]) {
-          corrupted = corrupted.substring(0, i) + replacements[char] + corrupted.substring(i + 1)
+        const currentChar = corrupted[i];
+        if (typeof currentChar === "string") {
+          const char = currentChar.toLowerCase();
+
+          const replacements: Record<string, string> = {
+            a: "@",
+            e: "3",
+            i: "1",
+            o: "0",
+            s: "$",
+            t: "7",
+            l: "1",
+          };
+          if (replacements[char]) {
+            corrupted =
+              corrupted.substring(0, i) +
+              replacements[char] +
+              corrupted.substring(i + 1);
+          }
         }
       }
     }
   }
 
-  return corrupted
-}
+  return corrupted;
+};
 
 const getCorruptionClasses = (level: number, isActive: boolean): string => {
-  if (!isActive) return ""
+  if (!isActive) return "";
 
-  const baseClasses = "transition-all duration-100"
+  const baseClasses = "transition-all duration-100";
 
   switch (level) {
     case 1:
-      return `${baseClasses} text-red-400/80`
+      return `${baseClasses} text-red-400/80`;
     case 2:
-      return `${baseClasses} text-red-400 animate-pulse`
+      return `${baseClasses} text-red-400 animate-pulse`;
     case 3:
-      return `${baseClasses} text-red-500 animate-pulse bg-red-500/10 px-1 -mx-1 rounded`
+      return `${baseClasses} text-red-500 animate-pulse bg-red-500/10 px-1 -mx-1 rounded`;
     default:
-      return baseClasses
+      return baseClasses;
   }
-}
+};
 
 export default function Component() {
-  const [currentPath, setCurrentPath] = useState("/")
-  const [selectedItems, setSelectedItems] = useState<string[]>([])
-  const [uploadDialogOpen, setUploadDialogOpen] = useState(false)
-  const [easterEggTriggered, setEasterEggTriggered] = useState(false)
-  const [konami, setKonami] = useState<string[]>([])
-  const [glitchActive, setGlitchActive] = useState(false)
-  const [corruptionActive, setCorruptionActive] = useState<Record<string, boolean>>({})
+  const [currentPath, setCurrentPath] = useState("/");
+  const [selectedItems, setSelectedItems] = useState<string[]>([]);
+  const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
+  const [easterEggTriggered, setEasterEggTriggered] = useState(false);
+  const [konami, setKonami] = useState<string[]>([]);
+  const [glitchActive, setGlitchActive] = useState(false);
+  const [corruptionActive, setCorruptionActive] = useState<
+    Record<string, boolean>
+  >({});
 
-  const currentItems = mockData[currentPath] || []
-  const pathSegments = currentPath.split("/").filter(Boolean)
+  const currentItems = mockData[currentPath] ?? [];
+  const pathSegments = currentPath.split("/").filter(Boolean);
 
   // Random glitch effect
   useEffect(() => {
     const glitchInterval = setInterval(() => {
       if (Math.random() < 0.1) {
         // 10% chance every 3 seconds
-        setGlitchActive(true)
-        setTimeout(() => setGlitchActive(false), 150)
+        setGlitchActive(true);
+        setTimeout(() => setGlitchActive(false), 150);
       }
-    }, 3000)
+    }, 3000);
 
-    return () => clearInterval(glitchInterval)
-  }, [])
+    return () => clearInterval(glitchInterval);
+  }, []);
 
   // Corruption effect for individual files
   useEffect(() => {
     const corruptionInterval = setInterval(() => {
-      const newCorruptionState: Record<string, boolean> = {}
+      const newCorruptionState: Record<string, boolean> = {};
 
       // Check all items in current directory for corruption
       currentItems.forEach((item) => {
         if (item.corrupted) {
           // Higher corruption level = more frequent corruption
-          const corruptionChance = item.corruptionLevel! * 0.2 // 20%, 40%, 60%
-          newCorruptionState[item.id] = Math.random() < corruptionChance
+          const corruptionChance = item.corruptionLevel! * 0.2; // 20%, 40%, 60%
+          newCorruptionState[item.id] = Math.random() < corruptionChance;
         }
-      })
+      });
 
-      setCorruptionActive(newCorruptionState)
-    }, 500) // Check every 500ms for more frequent corruption
+      setCorruptionActive(newCorruptionState);
+    }, 500); // Check every 500ms for more frequent corruption
 
-    return () => clearInterval(corruptionInterval)
-  }, [currentItems])
+    return () => clearInterval(corruptionInterval);
+  }, [currentItems]);
 
   // Easter egg: Konami code detection
   useEffect(() => {
@@ -352,67 +422,74 @@ export default function Component() {
       "ArrowRight",
       "KeyB",
       "KeyA",
-    ]
+    ];
 
     const handleKeyDown = (e: KeyboardEvent) => {
-      const newKonami = [...konami, e.code].slice(-10)
-      setKonami(newKonami)
+      const newKonami = [...konami, e.code].slice(-10);
+      setKonami(newKonami);
 
       if (newKonami.join(",") === konamiCode.join(",")) {
-        setEasterEggTriggered(true)
-        console.log("🌐 You have accessed Layer 14. Welcome to the Wired.")
-        setTimeout(() => setEasterEggTriggered(false), 3000)
+        setEasterEggTriggered(true);
+        console.log("🌐 You have accessed Layer 14. Welcome to the Wired.");
+        setTimeout(() => setEasterEggTriggered(false), 3000);
       }
-    }
+    };
 
-    window.addEventListener("keydown", handleKeyDown)
-    return () => window.removeEventListener("keydown", handleKeyDown)
-  }, [konami])
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [konami]);
 
   // Easter egg: Console messages
   useEffect(() => {
-    console.log("Present day... Present time... Ahahahaha!")
-    console.log("💊 Try the Konami code for a surprise")
-    console.log("🔍 Look for hidden files...")
-    console.log("⚠️ Some files appear to be corrupted...")
-  }, [])
+    console.log("Present day... Present time... Ahahahaha!");
+    console.log("💊 Try the Konami code for a surprise");
+    console.log("🔍 Look for hidden files...");
+    console.log("⚠️ Some files appear to be corrupted...");
+  }, []);
 
   const navigateToFolder = (folderName: string) => {
-    const newPath = currentPath === "/" ? `/${folderName}` : `${currentPath}/${folderName}`
-    setCurrentPath(newPath)
-    setSelectedItems([])
+    const newPath =
+      currentPath === "/" ? `/${folderName}` : `${currentPath}/${folderName}`;
+    setCurrentPath(newPath);
+    setSelectedItems([]);
 
     // Easter egg: Special folder messages
     if (folderName === "wired") {
-      console.log("🌐 Entering the Wired... Reality and virtuality merge.")
+      console.log("🌐 Entering the Wired... Reality and virtuality merge.");
     } else if (folderName === "cyberia") {
-      console.log("🎵 Welcome to Cyberia. The music never stops.")
+      console.log("🎵 Welcome to Cyberia. The music never stops.");
     } else if (folderName === "protocol_7") {
-      console.log("⚠️ WARNING: Protocol 7 files detected. Data integrity compromised.")
+      console.log(
+        "⚠️ WARNING: Protocol 7 files detected. Data integrity compromised.",
+      );
     }
-  }
+  };
 
   const navigateToPath = (index: number) => {
     if (index === -1) {
-      setCurrentPath("/")
+      setCurrentPath("/");
     } else {
-      const newPath = "/" + pathSegments.slice(0, index + 1).join("/")
-      setCurrentPath(newPath)
+      const newPath = "/" + pathSegments.slice(0, index + 1).join("/");
+      setCurrentPath(newPath);
     }
-    setSelectedItems([])
-  }
+    setSelectedItems([]);
+  };
 
   const toggleItemSelection = (itemId: string) => {
-    setSelectedItems((prev) => (prev.includes(itemId) ? prev.filter((id) => id !== itemId) : [...prev, itemId]))
-  }
+    setSelectedItems((prev) =>
+      prev.includes(itemId)
+        ? prev.filter((id) => id !== itemId)
+        : [...prev, itemId],
+    );
+  };
 
   return (
-    <div className="min-h-screen bg-black text-green-400 font-mono relative overflow-hidden">
+    <div className="relative min-h-screen overflow-hidden bg-black font-mono text-green-400">
       {/* Glitchy Background Effects */}
-      <div className="fixed inset-0 pointer-events-none">
+      <div className="pointer-events-none fixed inset-0">
         {/* Scanlines */}
         <div className="absolute inset-0 opacity-20">
-          <div className="absolute inset-0 bg-[linear-gradient(transparent_50%,rgba(0,255,0,0.03)_50%)] bg-[length:100%_4px] animate-pulse" />
+          <div className="absolute inset-0 animate-pulse bg-[linear-gradient(transparent_50%,rgba(0,255,0,0.03)_50%)] bg-[length:100%_4px]" />
         </div>
 
         {/* Grid */}
@@ -423,7 +500,7 @@ export default function Component() {
         {/* Digital noise */}
         <div className="absolute inset-0 opacity-10">
           <div
-            className="absolute inset-0 bg-repeat animate-pulse"
+            className="absolute inset-0 animate-pulse bg-repeat"
             style={{
               backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='1' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.1'/%3E%3C/svg%3E")`,
               backgroundSize: "100px 100px",
@@ -433,8 +510,8 @@ export default function Component() {
 
         {/* Glitch overlay */}
         {glitchActive && (
-          <div className="absolute inset-0 bg-green-400/5 animate-pulse">
-            <div className="absolute inset-0 bg-[linear-gradient(90deg,transparent_0%,rgba(0,255,0,0.1)_50%,transparent_100%)] animate-ping" />
+          <div className="absolute inset-0 animate-pulse bg-green-400/5">
+            <div className="absolute inset-0 animate-ping bg-[linear-gradient(90deg,transparent_0%,rgba(0,255,0,0.1)_50%,transparent_100%)]" />
           </div>
         )}
 
@@ -444,9 +521,11 @@ export default function Component() {
 
       {/* Easter egg overlay */}
       {easterEggTriggered && (
-        <div className="fixed inset-0 bg-green-400/10 backdrop-blur-sm z-50 flex items-center justify-center">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-green-400/10 backdrop-blur-sm">
           <div className="text-center">
-            <div className="text-4xl font-bold text-green-400 mb-4 animate-pulse">LAYER 14 ACCESSED</div>
+            <div className="mb-4 animate-pulse text-4xl font-bold text-green-400">
+              LAYER 14 ACCESSED
+            </div>
             <div className="text-lg text-green-300">You are everywhere</div>
           </div>
         </div>
@@ -458,36 +537,46 @@ export default function Component() {
           <div className="px-6 py-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-4">
-                <h1 className={`text-xl font-bold text-green-400 ${glitchActive ? "animate-pulse" : ""}`}>
+                <h1
+                  className={`text-xl font-bold text-green-400 ${glitchActive ? "animate-pulse" : ""}`}
+                >
                   lain_drive://
                 </h1>
-                <Badge variant="outline" className="border-green-400/50 text-green-400/70 text-xs">
+                <Badge
+                  variant="outline"
+                  className="border-green-400/50 text-xs text-green-400/70"
+                >
                   connected
                 </Badge>
               </div>
 
-              <Dialog open={uploadDialogOpen} onOpenChange={setUploadDialogOpen}>
+              <Dialog
+                open={uploadDialogOpen}
+                onOpenChange={setUploadDialogOpen}
+              >
                 <DialogTrigger asChild>
                   <Button
                     variant="ghost"
-                    className="border border-green-400/30 text-green-400/80 hover:bg-green-400/10 hover:border-green-400/50 hover:text-green-400 transition-all duration-200 text-sm"
+                    className="border border-green-400/30 text-sm text-green-400/80 transition-all duration-200 hover:border-green-400/50 hover:bg-green-400/10 hover:text-green-400"
                   >
-                    <Upload className="w-4 h-4 mr-2" />
+                    <Upload className="mr-2 h-4 w-4" />
                     upload
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="bg-black/95 border-green-400/30 text-green-400">
+                <DialogContent className="border-green-400/30 bg-black/95 text-green-400">
                   <DialogHeader>
-                    <DialogTitle className="text-green-400">upload_file</DialogTitle>
+                    <DialogTitle className="text-green-400">
+                      upload_file
+                    </DialogTitle>
                   </DialogHeader>
                   <div className="space-y-4">
                     <Input
                       type="file"
-                      className="border-green-400/30 bg-black/50 text-green-400 file:bg-green-400/10 file:text-green-400 file:border-0 file:mr-4 file:py-2 file:px-4 file:rounded file:border file:border-green-400/30 file:hover:bg-green-400/20 file:transition-colors"
+                      className="border-green-400/30 bg-black/50 text-green-400 file:mr-4 file:rounded file:border file:border-0 file:border-green-400/30 file:bg-green-400/10 file:px-4 file:py-2 file:text-green-400 file:transition-colors file:hover:bg-green-400/20"
                       multiple
                     />
                     <Button
-                      className="w-full bg-green-400/10 hover:bg-green-400/20 text-green-400 border border-green-400/30 hover:border-green-400/50 transition-all duration-200"
+                      className="w-full border border-green-400/30 bg-green-400/10 text-green-400 transition-all duration-200 hover:border-green-400/50 hover:bg-green-400/20"
                       variant="ghost"
                     >
                       execute
@@ -501,16 +590,19 @@ export default function Component() {
             <nav className="mt-3 flex items-center space-x-2 text-sm text-green-400/70">
               <button
                 onClick={() => navigateToPath(-1)}
-                className="flex items-center space-x-1 hover:text-green-400 transition-colors"
+                className="flex items-center space-x-1 transition-colors hover:text-green-400"
               >
-                <Home className="w-3 h-3" />
+                <Home className="h-3 w-3" />
                 <span>~</span>
               </button>
 
               {pathSegments.map((segment, index) => (
                 <div key={index} className="flex items-center space-x-2">
-                  <ChevronRight className="w-3 h-3 text-green-400/40" />
-                  <button onClick={() => navigateToPath(index)} className="hover:text-green-400 transition-colors">
+                  <ChevronRight className="h-3 w-3 text-green-400/40" />
+                  <button
+                    onClick={() => navigateToPath(index)}
+                    className="transition-colors hover:text-green-400"
+                  >
                     {segment}
                   </button>
                 </div>
@@ -521,9 +613,9 @@ export default function Component() {
 
         {/* Main Content */}
         <main className="p-6">
-          <div className="bg-black/40 border border-green-400/20 rounded-sm overflow-hidden backdrop-blur-sm">
+          <div className="overflow-hidden rounded-sm border border-green-400/20 bg-black/40 backdrop-blur-sm">
             {/* List Header */}
-            <div className="grid grid-cols-12 gap-4 px-4 py-2 bg-green-400/5 border-b border-green-400/10 text-xs text-green-400/60">
+            <div className="grid grid-cols-12 gap-4 border-b border-green-400/10 bg-green-400/5 px-4 py-2 text-xs text-green-400/60">
               <div className="col-span-6">name</div>
               <div className="col-span-2">size</div>
               <div className="col-span-3">modified</div>
@@ -533,22 +625,35 @@ export default function Component() {
             {/* File List */}
             <div className="divide-y divide-green-400/10">
               {currentItems.map((item) => {
-                const isCorrupted = item.corrupted && corruptionActive[item.id]
+                const isCorrupted =
+                  (item.corrupted ?? false) && (corruptionActive[item.id] ?? false);
                 const corruptedName = item.corrupted
-                  ? corruptText(item.name, item.corruptionLevel || 1, isCorrupted)
-                  : item.name
+                  ? corruptText(
+                      item.name,
+                      item.corruptionLevel ?? 1,
+                      isCorrupted,
+                    )
+                  : item.name;
                 const corruptedSize =
                   item.corrupted && item.size
-                    ? corruptText(item.size, item.corruptionLevel || 1, isCorrupted)
-                    : item.size
+                    ? corruptText(
+                        item.size,
+                        item.corruptionLevel ?? 1,
+                        isCorrupted,
+                      )
+                    : item.size;
                 const corruptedDate = item.corrupted
-                  ? corruptText(item.modified, item.corruptionLevel || 1, isCorrupted)
-                  : item.modified
+                  ? corruptText(
+                      item.modified,
+                      item.corruptionLevel ?? 1,
+                      isCorrupted,
+                    )
+                  : item.modified;
 
                 return (
                   <div
                     key={item.id}
-                    className={`grid grid-cols-12 gap-4 px-4 py-3 hover:bg-green-400/5 transition-colors cursor-pointer group ${
+                    className={`group grid cursor-pointer grid-cols-12 gap-4 px-4 py-3 transition-colors hover:bg-green-400/5 ${
                       selectedItems.includes(item.id) ? "bg-green-400/10" : ""
                     } ${glitchActive && Math.random() < 0.3 ? "animate-pulse" : ""} ${
                       isCorrupted ? "bg-red-500/5" : ""
@@ -556,16 +661,22 @@ export default function Component() {
                     onClick={() => toggleItemSelection(item.id)}
                   >
                     <div className="col-span-6 flex items-center space-x-3">
-                      <div className={`text-green-400/60 ${isCorrupted ? "animate-pulse" : ""}`}>
-                        {item.type === "folder" ? <Folder className="w-4 h-4" /> : getFileIcon(item.fileType)}
+                      <div
+                        className={`text-green-400/60 ${isCorrupted ? "animate-pulse" : ""}`}
+                      >
+                        {item.type === "folder" ? (
+                          <Folder className="h-4 w-4" />
+                        ) : (
+                          getFileIcon(item.fileType)
+                        )}
                       </div>
                       {item.type === "folder" ? (
                         <button
                           onClick={(e) => {
-                            e.stopPropagation()
-                            navigateToFolder(item.name)
+                            e.stopPropagation();
+                            navigateToFolder(item.name);
                           }}
-                          className={`text-green-400 hover:text-green-300 transition-colors text-sm ${getCorruptionClasses(item.corruptionLevel || 0, isCorrupted)}`}
+                          className={`text-sm text-green-400 transition-colors hover:text-green-300 ${getCorruptionClasses(item.corruptionLevel ?? 0, isCorrupted)}`}
                         >
                           {corruptedName}/
                         </button>
@@ -573,35 +684,47 @@ export default function Component() {
                         <a
                           href={item.url}
                           onClick={(e) => {
-                            e.stopPropagation()
+                            e.stopPropagation();
                             // Easter egg: Special file click messages
                             if (item.name === "navi.exe") {
-                              console.log("🤖 Navi activated. I am here.")
+                              console.log("🤖 Navi activated. I am here.");
                               if (item.corrupted) {
-                                console.log("⚠️ WARNING: Navi executable appears corrupted. Proceed with caution.")
+                                console.log(
+                                  "⚠️ WARNING: Navi executable appears corrupted. Proceed with caution.",
+                                );
                               }
-                            } else if (item.name === "present_day_present_time.txt") {
-                              console.log('📝 "Present day... Present time... Ahahahaha!"')
+                            } else if (
+                              item.name === "present_day_present_time.txt"
+                            ) {
+                              console.log(
+                                '📝 "Present day... Present time... Ahahahaha!"',
+                              );
                             } else if (item.corrupted) {
-                              console.log(`⚠️ File ${item.name} shows signs of data corruption.`)
+                              console.log(
+                                `⚠️ File ${item.name} shows signs of data corruption.`,
+                              );
                             }
                           }}
-                          className={`text-green-400/80 hover:text-green-400 transition-colors text-sm hover:underline ${getCorruptionClasses(item.corruptionLevel || 0, isCorrupted)}`}
+                          className={`text-sm text-green-400/80 transition-colors hover:text-green-400 hover:underline ${getCorruptionClasses(item.corruptionLevel ?? 0, isCorrupted)}`}
                         >
                           {corruptedName}
                         </a>
                       )}
-                      {item.corrupted && <span className="text-red-400/60 text-xs animate-pulse">⚠</span>}
+                      {item.corrupted && (
+                        <span className="animate-pulse text-xs text-red-400/60">
+                          ⚠
+                        </span>
+                      )}
                     </div>
 
                     <div
-                      className={`col-span-2 flex items-center text-green-400/60 text-sm font-mono ${getCorruptionClasses(item.corruptionLevel || 0, isCorrupted)}`}
+                      className={`col-span-2 flex items-center font-mono text-sm text-green-400/60 ${getCorruptionClasses(item.corruptionLevel ?? 0, isCorrupted)}`}
                     >
-                      {corruptedSize || "-"}
+                      {corruptedSize ?? "-"}
                     </div>
 
                     <div
-                      className={`col-span-3 flex items-center text-green-400/60 text-sm font-mono ${getCorruptionClasses(item.corruptionLevel || 0, isCorrupted)}`}
+                      className={`col-span-3 flex items-center font-mono text-sm text-green-400/60 ${getCorruptionClasses(item.corruptionLevel ?? 0, isCorrupted)}`}
                     >
                       {corruptedDate}
                     </div>
@@ -612,44 +735,44 @@ export default function Component() {
                           <Button
                             variant="ghost"
                             size="sm"
-                            className="opacity-0 group-hover:opacity-100 transition-opacity h-6 w-6 p-0 hover:bg-green-400/10 text-green-400/60 hover:text-green-400"
+                            className="h-6 w-6 p-0 text-green-400/60 opacity-0 transition-opacity group-hover:opacity-100 hover:bg-green-400/10 hover:text-green-400"
                             onClick={(e) => e.stopPropagation()}
                           >
-                            <MoreVertical className="w-3 h-3" />
+                            <MoreVertical className="h-3 w-3" />
                           </Button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent className="bg-black/95 border-green-400/30 text-green-400">
+                        <DropdownMenuContent className="border-green-400/30 bg-black/95 text-green-400">
                           {item.type === "file" && (
-                            <DropdownMenuItem className="hover:bg-green-400/10 text-sm">
-                              <Download className="w-3 h-3 mr-2" />
+                            <DropdownMenuItem className="text-sm hover:bg-green-400/10">
+                              <Download className="mr-2 h-3 w-3" />
                               download
                             </DropdownMenuItem>
                           )}
-                          <DropdownMenuItem className="hover:bg-green-400/10 text-sm">
-                            <Edit className="w-3 h-3 mr-2" />
+                          <DropdownMenuItem className="text-sm hover:bg-green-400/10">
+                            <Edit className="mr-2 h-3 w-3" />
                             rename
                           </DropdownMenuItem>
                           {item.corrupted && (
-                            <DropdownMenuItem className="hover:bg-yellow-400/10 hover:text-yellow-400 text-sm">
-                              <Code className="w-3 h-3 mr-2" />
+                            <DropdownMenuItem className="text-sm hover:bg-yellow-400/10 hover:text-yellow-400">
+                              <Code className="mr-2 h-3 w-3" />
                               repair
                             </DropdownMenuItem>
                           )}
-                          <DropdownMenuItem className="hover:bg-red-400/10 hover:text-red-400 text-sm">
-                            <Trash2 className="w-3 h-3 mr-2" />
+                          <DropdownMenuItem className="text-sm hover:bg-red-400/10 hover:text-red-400">
+                            <Trash2 className="mr-2 h-3 w-3" />
                             delete
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </div>
                   </div>
-                )
+                );
               })}
             </div>
 
             {currentItems.length === 0 && (
               <div className="px-4 py-12 text-center">
-                <div className="text-green-400/60 text-sm">empty directory</div>
+                <div className="text-sm text-green-400/60">empty directory</div>
               </div>
             )}
           </div>
@@ -658,21 +781,26 @@ export default function Component() {
           <div className="mt-4 flex items-center justify-between text-xs text-green-400/40">
             <div>
               {currentItems.length} items
-              {selectedItems.length > 0 && ` • ${selectedItems.length} selected`}
+              {selectedItems.length > 0 &&
+                ` • ${selectedItems.length} selected`}
               {currentItems.some((item) => item.corrupted) && (
-                <span className="text-red-400/60 ml-2">• corrupted files detected</span>
+                <span className="ml-2 text-red-400/60">
+                  • corrupted files detected
+                </span>
               )}
             </div>
             <div className="flex items-center space-x-4">
               <div className="flex items-center space-x-1">
-                <div className="w-1 h-1 bg-green-400 rounded-full animate-pulse" />
+                <div className="h-1 w-1 animate-pulse rounded-full bg-green-400" />
                 <span>online</span>
               </div>
-              <div className="font-mono">{currentPath === "/" ? "~" : currentPath}</div>
+              <div className="font-mono">
+                {currentPath === "/" ? "~" : currentPath}
+              </div>
             </div>
           </div>
         </main>
       </div>
     </div>
-  )
+  );
 }
