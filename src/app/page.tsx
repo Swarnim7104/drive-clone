@@ -81,9 +81,7 @@ export default function Component() {
     const filesInCurent = mockFiles.filter(
       (file) => file.parentId === currentFolderId,
     );
-    return [...foldersInCurrent, ...filesInCurent].sort((a, b) =>
-      a.name.localeCompare(b.name),
-    );
+    return [...foldersInCurrent, ...filesInCurent]
   }, [currentFolderId]);
 
   // Random glitch effect
