@@ -22,10 +22,13 @@ const conn =
     database: env.SINGLESTORE_DB_NAME,
     ssl: {},
     maxIdle: 0,
+    connectionLimit: 10,
+    queueLimit: 0,
   });
 if (env.NODE_ENV !== "production") globalForDb.conn = conn;
 
 conn.addListener("error", (err) => {
   console.error("Database connection error:", err);
 });
+
 export const db = drizzle(conn, { schema });

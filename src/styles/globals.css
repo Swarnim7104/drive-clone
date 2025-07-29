@@ -123,3 +123,146 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Glitch effect for title */
+@keyframes glitch {
+  0% {
+    text-shadow: 2px 0 #ff0000, -2px 0 #00ff00;
+  }
+  25% {
+    text-shadow: -2px 0 #ff0000, 2px 0 #00ff00;
+  }
+  50% {
+    text-shadow: 2px 0 #ff0000, -2px 0 #00ff00;
+  }
+  75% {
+    text-shadow: -2px 0 #ff0000, 2px 0 #00ff00;
+  }
+  100% {
+    text-shadow: 2px 0 #ff0000, -2px 0 #00ff00;
+  }
+}
+
+.glitch-text {
+  position: relative;
+  animation: glitch 0.3s infinite;
+}
+
+/* Konami Code flash animation */
+@keyframes flash {
+  0%, 100% { 
+    background-color: inherit; 
+  }
+  50% { 
+    background-color: #00ff00; 
+    filter: brightness(1.2);
+  }
+}
+
+/* Corruption Effects */
+.corrupted-subtle {
+  position: relative;
+}
+
+.corrupted-subtle::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(45deg, transparent 30%, rgba(239, 68, 68, 0.1) 50%, transparent 70%);
+  pointer-events: none;
+  animation: subtle-corruption 3s ease-in-out infinite;
+}
+
+@keyframes subtle-corruption {
+  0%, 100% { opacity: 0; }
+  50% { opacity: 1; }
+}
+
+.corrupted-glitch {
+  position: relative;
+  background: #000000;
+  color: #00ff00;
+  font-family: 'Courier New', monospace;
+}
+
+.corrupted-glitch::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(0, 255, 0, 0.03) 25%,
+    rgba(255, 0, 0, 0.03) 50%,
+    rgba(0, 0, 255, 0.03) 75%,
+    transparent 100%
+  );
+  animation: glitch-lines 0.5s linear infinite;
+  pointer-events: none;
+}
+
+.corrupted-glitch::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0, 255, 0, 0.05) 2px,
+      rgba(0, 255, 0, 0.05) 4px
+    );
+  pointer-events: none;
+}
+
+@keyframes glitch-lines {
+  0% { transform: translateX(0); }
+  20% { transform: translateX(-2px); }
+  40% { transform: translateX(2px); }
+  60% { transform: translateX(-1px); }
+  80% { transform: translateX(1px); }
+  100% { transform: translateX(0); }
+}
+
+.corrupted-destroyed {
+  position: relative;
+  background: #1a1a1a;
+  color: #ff0000;
+  font-family: 'Courier New', monospace;
+  text-shadow: 0 0 5px #ff0000;
+}
+
+.corrupted-destroyed::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    radial-gradient(ellipse at center, 
+      rgba(255, 0, 0, 0.1) 0%, 
+      transparent 50%),
+    linear-gradient(45deg, 
+      rgba(255, 0, 0, 0.05) 0%, 
+      transparent 25%, 
+      rgba(255, 0, 0, 0.05) 50%, 
+      transparent 75%);
+  animation: destruction-pulse 1s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+
+@keyframes destruction-pulse {
+  0% { opacity: 0.3; transform: scale(1); }
+  100% { opacity: 0.7; transform: scale(1.02); }
+}

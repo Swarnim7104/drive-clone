@@ -1,3 +1,5 @@
+import "server-only";
+
 import {
   int,
   bigint,
@@ -17,6 +19,10 @@ export const files = createTable(
     size: int("size"),
     url: text("url"),
     parent: bigint("parent", { mode: "bigint" }).notNull(),
+    corrupted: int("corrupted").default(0), // 0 = normal, 1+ = corruption levels
+    corruptionLevel: int("corruption_level").default(0),
+    fileType: text("file_type"),
+    modified: text("modified"),
   },
   (t) => {
     return [index("parent_index").on(t.parent)];
@@ -29,6 +35,9 @@ export const folders = createTable(
     id: bigint("id", { mode: "bigint" }).primaryKey().autoincrement(),
     name: text("name").notNull(),
     parent: bigint("parent", { mode: "bigint" }),
+    corrupted: int("corrupted").default(0),
+    corruptionLevel: int("corruption_level").default(0),
+    modified: text("modified"),
   },
   (t) => {
     return [index("parent_index").on(t.parent)];

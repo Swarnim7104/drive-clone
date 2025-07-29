@@ -30,6 +30,30 @@ export const mockFolders: Folder[] = [
     modified: "",
   },
 
+  // Normal folders for level 1 (clean state)
+  {
+    id: "normal_1",
+    name: "Documents",
+    type: "folder",
+    parentId: "root",
+    modified: "2024.01.15",
+  },
+  {
+    id: "normal_2", 
+    name: "Images",
+    type: "folder",
+    parentId: "root",
+    modified: "2024.01.12",
+  },
+  {
+    id: "normal_3",
+    name: "Work Files",
+    type: "folder", 
+    parentId: "root",
+    modified: "2024.01.10",
+  },
+
+  // Lain/corrupted folders for level 2+ (corruption state)
   {
     id: "1",
     name: "wired",
@@ -110,7 +134,40 @@ export const mockFolders: Folder[] = [
   },
 ];
 export const mockFiles: FileItem[] = [
-  // --- ROOT LEVEL ITEMS (parentId: 'root-drive') ---
+  // --- NORMAL FILES FOR LEVEL 1 (clean state) ---
+  {
+    id: "normal_file_1",
+    name: "Meeting Notes.docx",
+    type: "file",
+    parentId: "root",
+    size: "245 KB",
+    modified: "2024.01.15",
+    fileType: "document",
+    url: "#",
+  },
+  {
+    id: "normal_file_2", 
+    name: "Quarterly Report.pdf",
+    type: "file",
+    parentId: "root",
+    size: "1.2 MB",
+    modified: "2024.01.12",
+    fileType: "pdf",
+    url: "#",
+  },
+  {
+    id: "normal_file_3",
+    name: "Budget Spreadsheet.xlsx",
+    type: "file",
+    parentId: "root", 
+    size: "89 KB",
+    modified: "2024.01.10",
+    fileType: "spreadsheet",
+    url: "#",
+  },
+
+  // --- LAIN/CORRUPTED FILES FOR LEVEL 2+ (corruption state) ---
+  // ROOT LEVEL ITEMS (parentId: 'root-drive')
   // The primary "My Drive" equivalent folder
 
   // Items previously under "/" now have parentId: "root-drive"
